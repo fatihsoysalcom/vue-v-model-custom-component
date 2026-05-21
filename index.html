@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue.js v-model on Custom Components</title>
+    <!-- Vue.js 3 CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        #app {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #42b983;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .custom-input-wrapper {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        p {
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+        strong {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Vue.js v-model on Custom Components</h1>
+
+        <p>This is the parent component's data: <strong>{{ parentMessage }}</strong></p>
+
+        <!-- 
+            The v-model directive on a custom component is syntactic sugar for:
+            :modelValue="parentMessage"
+            @update:modelValue="newValue => parentMessage = newValue"
+            
+            The custom component must accept a 'modelValue' prop and emit an 'update:modelValue' event.
+        -->
+        <my-custom-input v-model="parentMessage"></my-custom-input>
+
+        <p>Type into the custom input field above to see how the <code>parentMessage</code> data in the parent component updates automatically, demonstrating two-way data binding with <code>v-model</code>.</p>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    parentMessage: 'Hello from Parent!'
+                };
+            },
+            components: {
+                // Define our custom component
+                'my-custom-input': {
+                    // v-model expects a prop named 'modelValue' by default
+                    props: ['modelValue'], 
+                    // v-model expects an event named 'update:modelValue' by default
+                    emits: ['update:modelValue'], 
+                    template: `
+                        <div class="custom-input-wrapper">
+                            <label>Custom Input Field:</label>
+                            <input
+                                type="text"
+                                :value="modelValue" // Bind the input's value to the 'modelValue' prop
+                                @input="$emit('update:modelValue', $event.target.value)" // Emit 'update:modelValue' when input changes
+                            />
+                            <p>Internal component's view of the value: <em>{{ modelValue }}</em></p>
+                        </div>
+                    `
+                }
+            }
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>
